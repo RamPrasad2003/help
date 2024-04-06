@@ -7,12 +7,12 @@
 </head>
 <body>
 <video id="videoElement" autoplay></video>
-<button onclick="toggleCamera()">Switch Camera</button>
+<button onclick="toggleCamera()">Switch Cameraaa</button>
 
 <script>
 let videoElement = document.getElementById('videoElement');
 let currentStream;
-let currentCamera = "user"; // Default to back camera
+let currentCamera = "environment"; // Default to back camera
 
 function toggleCamera() {
     currentCamera = (currentCamera === "user") ? "environment" : "user"; // Toggle between front and back camera
