@@ -7,42 +7,22 @@
 </head>
 <body>
 <video id="videoElement" autoplay></video>
-<button onclick="startCamera()">Start Camera</button>
-<button onclick="stopCamera()">Stop Camera</button>
-<button onclick="switchCamera()">Switch Camera</button>
+<button onclick="startBackCamera()">Start Back Camera</button>
 
 <script>
 let videoElement = document.getElementById('videoElement');
 let currentStream;
-let currentDeviceIndex = 0;
 
-function startCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function(stream) {
-        videoElement.srcObject = stream;
-        currentStream = stream;
-    })
-    .catch(function(err) {
-        console.log('Error: ' + err.message);
-    });
-}
-
-function stopCamera() {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-        videoElement.srcObject = null;
-    }
-}
-
-function switchCamera() {
+function startBackCamera() {
     navigator.mediaDevices.enumerateDevices()
     .then(function(devices) {
-        let videoDevices = devices.filter(device => device.kind === 'videoinput');
-        if (videoDevices.length > 1) {
-            currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
-            startCameraWithDevice(videoDevices[currentDeviceIndex].deviceId);
+        // Filter video input devices to find the back camera
+        let backCamera = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
+        if (backCamera) {
+            // Start the camera with the back camera device ID
+            startCameraWithDevice(backCamera.deviceId);
         } else {
-            console.log('Only one camera available.');
+            console.log('Back camera not found.');
         }
     })
     .catch(function(err) {
@@ -62,8 +42,12 @@ function startCameraWithDevice(deviceId) {
     });
 }
 
-// Start the camera with the default device when the page loads
-startCamera();
+function stopCamera() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
+    }
+}
 </script>
 </body>
 </html>
