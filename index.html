@@ -7,32 +7,20 @@
 </head>
 <body>
 <video id="videoElement" autoplay></video>
-<button onclick="startCamera('front')">Start Front Camera</button>
-<button onclick="startCamera('back')">Start Back Camera</button>
+<button onclick="toggleCamera()">Switch Camera</button>
 
 <script>
 let videoElement = document.getElementById('videoElement');
 let currentStream;
+let currentCamera = 'environment'; // Default to back camera
 
-function startCamera(cameraType) {
-    navigator.mediaDevices.enumerateDevices()
-    .then(function(devices) {
-        // Filter video input devices based on camera type
-        let cameraDevice = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes(cameraType));
-        if (cameraDevice) {
-            // Start the camera with the selected camera device ID
-            startCameraWithDevice(cameraDevice.deviceId);
-        } else {
-            console.log(cameraType + ' camera not found.');
-        }
-    })
-    .catch(function(err) {
-        console.log('Error enumerating devices: ' + err.message);
-    });
+function toggleCamera() {
+    currentCamera = (currentCamera === 'user') ? 'environment' : 'user'; // Toggle between front and back camera
+    startCamera(currentCamera);
 }
 
-function startCameraWithDevice(deviceId) {
-    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: deviceId } } })
+function startCamera(cameraType) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraType } })
     .then(function(stream) {
         stopCamera();
         videoElement.srcObject = stream;
@@ -49,6 +37,9 @@ function stopCamera() {
         videoElement.srcObject = null;
     }
 }
+
+// Initially start with the back camera
+startCamera(currentCamera);
 </script>
 </body>
 </html>
