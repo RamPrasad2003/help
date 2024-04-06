@@ -39,7 +39,7 @@ function startCameraWithDevice(deviceId) {
         currentStream = stream;
     })
     .catch(function(err) {
-        console.log('Error: ' + err.message);
+        console.log('Error accessing camera: ' + err.message);
     });
 }
 
