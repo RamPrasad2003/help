@@ -7,22 +7,23 @@
 </head>
 <body>
 <video id="videoElement" autoplay></video>
-<button onclick="startBackCamera()">Start Back Camera</button>
+<button onclick="startCamera('front')">Start Front Camera</button>
+<button onclick="startCamera('back')">Start Back Camera</button>
 
 <script>
 let videoElement = document.getElementById('videoElement');
 let currentStream;
 
-function startBackCamera() {
+function startCamera(cameraType) {
     navigator.mediaDevices.enumerateDevices()
     .then(function(devices) {
-        // Filter video input devices to find the back camera
-        let backCamera = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
-        if (backCamera) {
-            // Start the camera with the back camera device ID
-            startCameraWithDevice(backCamera.deviceId);
+        // Filter video input devices based on camera type
+        let cameraDevice = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes(cameraType));
+        if (cameraDevice) {
+            // Start the camera with the selected camera device ID
+            startCameraWithDevice(cameraDevice.deviceId);
         } else {
-            console.log('Back camera not found.');
+            console.log(cameraType + ' camera not found.');
         }
     })
     .catch(function(err) {
