@@ -15,7 +15,7 @@ let currentStream;
 let currentCamera = "user"; // Default to back camera
 
 function toggleCamera() {
-    //currentCamera = (currentCamera === "user") ? "environment" : "user"; // Toggle between front and back camera
+    currentCamera = (currentCamera === "user") ? "environment" : "user"; // Toggle between front and back camera
     startCamera(currentCamera);
 }
 
