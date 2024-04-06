@@ -3,65 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Webcam Example</title>
-<style>
-    #videoElement {
-        width: 400px;
-        height: 300px;
-        background-color: black;
-    }
-</style>
+<title>Camera Access</title>
 </head>
 <body>
-<video autoplay="true" id="videoElement"></video>
+<video id="videoElement" autoplay></video>
+<button onclick="startCamera()">Start Camera</button>
+<button onclick="stopCamera()">Stop Camera</button>
 <button onclick="switchCamera()">Switch Camera</button>
 
 <script>
-    let videoElement = document.getElementById('videoElement');
-    let currentStream;
-    let currentDeviceIndex = 0;
+let videoElement = document.getElementById('videoElement');
+let currentStream;
+let currentDeviceIndex = 0;
 
-    // Function to switch between front and back cameras
-    function switchCamera() {
-        navigator.mediaDevices.enumerateDevices()
-        .then(function(devices) {
-            // Filter video input devices
-            let videoDevices = devices.filter(device => device.kind === 'videoinput');
-            if (videoDevices.length > 1) {
-                currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+        videoElement.srcObject = stream;
+        currentStream = stream;
+    })
+    .catch(function(err) {
+        console.log('Error: ' + err.message);
+    });
+}
 
-                // Stop the current stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-
-                // Create constraints for the new device
-                let constraints = {
-                    video: {
-                        deviceId: { exact: videoDevices[currentDeviceIndex].deviceId }
-                    }
-                };
-
-                // Get access to the new device
-                navigator.mediaDevices.getUserMedia(constraints)
-                .then(function(stream) {
-                    videoElement.srcObject = stream;
-                    currentStream = stream;
-                })
-                .catch(function(err) {
-                    console.log('Error accessing device: ' + err.message);
-                });
-            } else {
-                console.log('Only one camera available.');
-            }
-        })
-        .catch(function(err) {
-            console.log('Error enumerating devices: ' + err.message);
-        });
+function stopCamera() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
     }
+}
 
-    // Initialize with the default camera
-    switchCamera();
+function switchCamera() {
+    navigator.mediaDevices.enumerateDevices()
+    .then(function(devices) {
+        let videoDevices = devices.filter(device => device.kind === 'videoinput');
+        if (videoDevices.length > 1) {
+            currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+            startCameraWithDevice(videoDevices[currentDeviceIndex].deviceId);
+        } else {
+            console.log('Only one camera available.');
+        }
+    })
+    .catch(function(err) {
+        console.log('Error enumerating devices: ' + err.message);
+    });
+}
+
+function startCameraWithDevice(deviceId) {
+    navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: deviceId } } })
+    .then(function(stream) {
+        stopCamera();
+        videoElement.srcObject = stream;
+        currentStream = stream;
+    })
+    .catch(function(err) {
+        console.log('Error: ' + err.message);
+    });
+}
+
+// Start the camera with the default device when the page loads
+startCamera();
 </script>
 </body>
 </html>
